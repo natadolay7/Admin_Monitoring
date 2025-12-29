@@ -42,7 +42,7 @@ class AuthController extends Controller
         Auth::loginUsingId($user->id);
         $request->session()->regenerate();
 
-        return redirect()->intended('/dashboard');
+        return redirect()->intended('/');
     }
 
     public function logout(Request $request)
