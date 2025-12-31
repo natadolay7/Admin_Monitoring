@@ -60,7 +60,7 @@ Route::middleware('auth')->group(function () {
         });
         Route::controller(TaskController::class)->group(function () {
             Route::get('tasks', 'index');
-            // Route::get('schedule-list/datatable', 'datatable')->name('schedulelist.datatable');
+            Route::get('tasks/datatable', 'datatable')->name('task.datatable');
         });
         Route::controller(PatrolController::class)->group(function () {
             Route::get('master-patroli', 'index');
