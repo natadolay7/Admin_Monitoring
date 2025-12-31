@@ -92,11 +92,11 @@
                                         </svg>
                                     </span>
                                 </span>
-                                <span class="app-brand-text demo text-heading fw-bold">Vuexy</span>
+                                <span class="app-brand-text demo text-heading fw-bold">MonitoringApp Admin</span>
                             </a>
                         </div>
                         <!-- /Logo -->
-                        <h4 class="mb-1">Welcome to Vuexy! 👋</h4>
+                        <h4 class="mb-1">Welcome to MonitoringApp Admin! 👋</h4>
                         <p class="mb-6">Please sign-in to your account and start the adventure</p>
 
                         <form id="formAuthentication" class="mb-4" action="{{ route('login.post') }}" method="POST">
@@ -147,14 +147,14 @@
                         </form>
 
 
-                        <p class="text-center">
+                        {{-- <p class="text-center">
                             <span>New on our platform?</span>
                             <a href="auth-register-basic.html">
                                 <span>Create an account</span>
                             </a>
-                        </p>
+                        </p> --}}
 
-                        <div class="divider my-6">
+                        {{-- <div class="divider my-6">
                             <div class="divider-text">or</div>
                         </div>
 
@@ -174,7 +174,7 @@
                             <a href="javascript:;" class="btn btn-icon rounded-circle btn-text-google-plus">
                                 <i class="icon-base ti tabler-brand-google-filled icon-20px"></i>
                             </a>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
                 <!-- /Login -->
