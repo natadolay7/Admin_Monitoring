@@ -4,6 +4,7 @@ namespace App\Http\Controllers\branch;
 
 use App\Http\Controllers\Controller;
 use App\Models\MasterPatroli;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -133,6 +134,59 @@ class PatrolController extends Controller
             })
 
             ->rawColumns(['qr', 'status', 'action'])
+            ->make(true);
+    }
+
+    public function report()
+    {
+        return view('pages.level.branch.patrol.report_patroli');
+    }
+
+    public function reportDatatable(Request $request)
+    {
+        $userBranch = DB::table('user_branch')
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$userBranch) {
+            return response()->json(['data' => []]);
+        }
+
+        $branchId = $userBranch->branch_id;
+
+        $query = DB::table('patroli_report as pr')
+            ->select(
+                'pr.id',
+                'u.name',
+                'uti.branch_id',
+                'mp.nama_lokasi',
+                'mp.kode',
+                'pr.created_at',
+                'pr.deskripsi'
+            )
+            ->leftJoin('master_patroli as mp', 'pr.id_patroli', '=', 'mp.id')
+            ->leftJoin('users as u', 'u.id', '=', 'pr.user_id')
+            ->leftJoin('user_tad_information as uti', 'uti.user_id', '=', 'u.id')
+            ->leftJoin('branch as b', 'b.id', '=', 'uti.branch_id')
+            ->where('b.id', $branchId);
+
+        // ✅ FILTER TANGGAL
+        if ($request->filled('from_date') && $request->filled('to_date')) {
+            $from = Carbon::parse($request->from_date)->startOfDay();
+            $to   = Carbon::parse($request->to_date)->endOfDay();
+
+            $query->whereBetween('pr.created_at', [$from, $to]);
+        }
+
+        return DataTables::of($query)
+            ->addIndexColumn()
+            ->editColumn('created_at', function ($row) {
+                return Carbon::parse($row->created_at)->format('d-m-Y H:i');
+            })
+            ->addColumn('action', function ($row) {
+                return '<a href="#" class="btn btn-sm btn-primary">Detail</a>';
+            })
+            ->rawColumns(['action'])
             ->make(true);
     }
 }

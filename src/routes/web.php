@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\auth\AuthController;
+use App\Http\Controllers\branch\AbsenController;
 use App\Http\Controllers\branch\PatrolController;
 use App\Http\Controllers\branch\ScheduleController;
 use App\Http\Controllers\branch\ScheduleShiftController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\branch\TaskController;
 use App\Http\Controllers\branch\UserController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CompanyController;
+use App\Models\MasterPatroli;
 use Illuminate\Support\Facades\Route;
 
 
@@ -41,37 +43,50 @@ Route::middleware('auth')->group(function () {
         });
     });
     Route::middleware('superadmin.branch')->group(function () {
-        Route::controller(UserController::class)->group(function () {
-            Route::get('management-users', 'index');
-            Route::get('management-users/add', 'add');
-            Route::post('management-users/store', 'store');
-            Route::get('management-users/datatable', 'datatable')->name('user.datatable');
-        });
-        Route::controller(ScheduleShiftController::class)->group(function () {
-            Route::get('schedule-shift', 'index');
-            Route::get('schedule-shift/add', 'add');
-            Route::post('schedule-shift/store', 'store');
-            Route::get('schedule-shift/datatable', 'datatable')->name('scheduleshift.datatable');
-            Route::get('schedule-shift/generate', 'generateScheduleBalanced');
-        });
-        Route::controller(ScheduleController::class)->group(function () {
-            Route::get('schedule-list', 'index');
-            Route::get('schedule-list/datatable', 'datatable')->name('schedulelist.datatable');
-        });
-        Route::controller(TaskController::class)->group(function () {
-            Route::get('tasks', 'index');
-            Route::get('tasks/datatable', 'datatable')->name('task.datatable');
-        });
-        Route::controller(PatrolController::class)->group(function () {
-            Route::get('master-patroli', 'index');
-            Route::get('master-patroli/add', 'add');
-            Route::get('master-patroli/datatable', 'datatable')->name('master.patroli');
-            Route::post('master-patroli/store', 'store');
-
-
-
-            // Route::get('schedule-list/datatable', 'datatable')->name('schedulelist.datatable');
-        });
+        Route::prefix('management-users')
+            ->controller(UserController::class)
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/add', 'add')->name('add');
+                Route::post('/store', 'store')->name('store');
+                Route::get('/datatable', 'datatable')->name('user.datatable');
+            });
+        Route::prefix('schedule-shift')
+            ->controller(ScheduleShiftController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::get('/add', 'add');
+                Route::post('/store', 'store');
+                Route::get('/datatable', 'datatable')->name('scheduleshift.datatable');
+                Route::get('/generate', 'generateScheduleBalanced');
+            });
+        Route::prefix('schedule-list')
+            ->controller(ScheduleController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::get('/datatable', 'datatable')->name('schedulelist.datatable');
+            });
+        Route::prefix('tasks')
+            ->controller(TaskController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::get('/datatable', 'datatable')->name('task.datatable');
+            });
+        Route::prefix('master-patroli')
+            ->controller(PatrolController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::get('/add', 'add');
+                Route::get('/datatable', 'datatable')->name('master.patroli');
+                Route::post('/store', 'store');
+                // Route::get('schedule-list/datatable', 'datatable')->name('schedulelist.datatable');
+            });
+        Route::prefix('report-absensi')
+            ->controller(AbsenController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::get('/datatable', 'datatable')->name('reportabsensi.datatable');
+            });
+         Route::prefix('report-patroli')
+            ->controller(PatrolController::class)->group(function () {
+                Route::get('/', 'report');
+                Route::get('/datatable', 'reportDatatable')->name('reportpatroli.datatable');
+            });
     });
 
 

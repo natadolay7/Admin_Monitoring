@@ -4,7 +4,7 @@
     data-bs-theme="light" data-assets-path="../../assets/" data-template="vertical-menu-template">
 
 <head>
-    @include('layouts.component.style');
+    @include('layouts.component.style')
     @yield('style')
     <style>
         #template-customizer{
@@ -18,7 +18,7 @@
     <div class="layout-wrapper layout-content-navbar  ">
         <div class="layout-container">
             <!-- Menu -->
-            @include('layouts.component.sidebar');
+            @include('layouts.component.sidebar')
 
 
             <!-- / Menu -->

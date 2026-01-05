@@ -13,7 +13,7 @@ class SuperAdminBranch
             return $next($request);
         }
 
-        abort(403, 'Akses khusus Super Admin App');
+        abort(403, 'Akses khusus Super Admin Branch');
     }
 }
 

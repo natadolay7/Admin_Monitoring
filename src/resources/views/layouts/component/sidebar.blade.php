@@ -40,6 +40,8 @@
         @if (session('user_role') === 'superadmin_branch')
             @php
                 $masterDataActive = request()->is('management-users*', 'schedule-shift*', 'schedule-list*', 'tasks*' , 'master-patroli*');
+                $masterReportActive = request()->is('report-absensi*' , 'report-patroli*');
+
             @endphp
             <li class="menu-item {{ $masterDataActive ? 'active open' : '' }}">
                 <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -73,6 +75,32 @@
                             <div data-i18n="Master Patroli">Master Patroli</div>
                         </a>
                     </li>
+
+                </ul>
+            </li>
+
+            <li class="menu-item {{ $masterReportActive ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon icon-base ti tabler-layout-navbar"></i>
+                    <div data-i18n="Report ">Report</div>
+                    {{-- <div class="badge text-bg-danger rounded-pill ms-auto">5</div> --}}
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ request()->is('report-absensi*') ? 'active' : '' }}">
+                        <a href="{{ url('report-absensi') }}" class="menu-link">
+                            <div data-i18n="Report Absensi">Report Absensi</div>
+                        </a>
+                    </li>
+
+
+                </ul>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ request()->is('report-patroli*') ? 'active' : '' }}">
+                        <a href="{{ url('report-patroli') }}" class="menu-link">
+                            <div data-i18n="Report Patroli">Report Patroli</div>
+                        </a>
+                    </li>
+
 
                 </ul>
             </li>
