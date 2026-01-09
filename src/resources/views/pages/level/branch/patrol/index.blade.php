@@ -30,9 +30,9 @@
         </div>
         <!-- DataTable with Buttons -->
         <div class="card">
-            <div class="card-datatable table-responsive pt-0">
-                <table class="datatables-basic table">
-                    <thead>
+            <div class="card-body table-responsive pt-0">
+                <table class="datatables-basic table table-bordered table-striped">
+                    <thead class="table-light">
                         <tr>
                             <th>No</th>
                             <th>Kode</th>

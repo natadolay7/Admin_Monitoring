@@ -30,9 +30,9 @@
         </div> --}}
         <!-- DataTable with Buttons -->
         <div class="card">
-            <div class="card-datatable table-responsive pt-0">
-                <table class="datatables-basic table">
-                    <thead>
+            <div class="card-body table-responsive pt-0">
+                <table class="datatables-basic table table-bordered table-striped">
+                    <thead class="table-light">
                         <tr>
                             <th>No</th>
                             <th>Name</th>
@@ -73,11 +73,11 @@
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
                     },
-                     {
+                    {
                         data: 'name',
                         name: 'name'
                     },
-                     {
+                    {
                         data: 'note',
                         name: 'note'
                     },

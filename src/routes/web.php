@@ -2,10 +2,13 @@
 
 use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\branch\AbsenController;
+use App\Http\Controllers\branch\MenuHasRoleController;
 use App\Http\Controllers\branch\PatrolController;
+use App\Http\Controllers\branch\RoleController;
 use App\Http\Controllers\branch\ScheduleController;
 use App\Http\Controllers\branch\ScheduleShiftController;
 use App\Http\Controllers\branch\TaskController;
+use App\Http\Controllers\branch\UserBranchController;
 use App\Http\Controllers\branch\UserController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CompanyController;
@@ -82,12 +85,62 @@ Route::middleware('auth')->group(function () {
                 Route::get('/', 'index');
                 Route::get('/datatable', 'datatable')->name('reportabsensi.datatable');
             });
-         Route::prefix('report-patroli')
+        Route::prefix('report-patroli')
             ->controller(PatrolController::class)->group(function () {
                 Route::get('/', 'report');
                 Route::get('/datatable', 'reportDatatable')->name('reportpatroli.datatable');
             });
+        Route::prefix('core')
+            ->group(
+                function () {
+                    Route::prefix('role')->controller(RoleController::class)
+                        ->group(function () {
+                            Route::get('/', 'index');
+                            Route::get('/add', 'add');
+                            Route::post('/store', 'store');
+                            Route::get('/datatable', 'datatable')->name('role.datatable');
+                            // Route::get('menu-has-role', 'menuHasRole');
+                        });
+                    Route::prefix('menu-has-role')->controller(MenuHasRoleController::class)
+                        ->group(function () {
+                            Route::get('/', 'index');
+                            Route::get('/add', 'add');
+                            Route::get( '/role', 'role')->name('role.ajax');
+                            Route::get( '/menu', 'menu')->name('menu.ajax');
+
+
+                            Route::post('/store', 'store');
+                            Route::get('/datatable', 'datatable')->name('role-menu.datatable');
+                            // Route::get('menu-has-role', 'menuHasRole');
+                        });
+                    Route::prefix('users')->controller(UserBranchController::class)
+                        ->group(function () {
+                            Route::get('/', 'index');
+                            Route::get('/add', 'add');
+                            Route::post('/store', 'store');
+                            Route::get('/datatable', 'datatable')->name('user_branch.datatable');
+                            // Route::get('menu-has-role', 'menuHasRole');
+                        });
+                }
+            );
+
+        Route::prefix('v2')
+            ->group(
+                function () {
+                    Route::prefix('management-users')
+                        ->controller(UserController::class)
+                        ->group(function () {
+                            Route::get('/', 'index')->name('index');
+                            Route::get('/add', 'add')->name('add');
+                            Route::post('/store', 'store')->name('store');
+                            Route::get('/datatable', 'datatable')->name('user.datatable');
+                        });
+                }
+            );
     });
+
+
+
 
 
 

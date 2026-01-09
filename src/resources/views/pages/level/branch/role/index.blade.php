@@ -20,30 +20,23 @@
                 {{ session('success') }}
             </div>
         @endif
-        @canAdd
         <div class="card mb-3">
             <div class="row p-4">
                 <div class="col-md-6">
-                    <a href="{{ url('schedule-shift/add') }}" class="btn btn-primary btn-lg">Tambah Data</a>
+                    <a href="{{ url('core/role/add') }}" class="btn btn-primary btn-lg">Tambah Role</a>
 
                 </div>
             </div>
         </div>
-        @endcanAdd
         <!-- DataTable with Buttons -->
         <div class="card">
-            <div class="card-body table-responsive pt-0">
-                <table class="datatables-basic table able-bordered table-striped">
-                    <thead class="table-light">
+            <div class="card-datatable table-responsive pt-0">
+                <table class="datatables-basic table table-bordered table-striped">
+                    <thead>
                         <tr>
                             <th>No</th>
-                            <th>Code</th>
-                            <th>Nama Shift </th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
-                            <th>Created Date</th>
-
-                            <th>Action</th>
+                            <th>Title</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                 </table>
@@ -62,7 +55,7 @@
             $('.datatables-basic').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ url('schedule-shift/datatable') }}",
+                ajax: "{{ route('role.datatable') }}",
 
                 columns: [{
                         data: null,
@@ -73,33 +66,17 @@
                         }
                     },
                     {
-                        data: 'code',
-                        name: 'code'
+                        data: 'title',
+                        name: 'title'
                     },
-                     {
-                        data: 'name',
-                        name: 'name'
-                    },
+
+
                     {
-                        data: 'start_time',
-                        name: 'start_time'
-                    },
-                    {
-                        data: 'end_time',
-                        name: 'end_time',
+                        data: 'action',
+                        name: 'action',
                         orderable: false
                     },
 
-                    {
-                        data: 'created_at',
-                        name: 'created_at',
-                        orderable: false
-                    },
-                    {
-                        data: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
                 ]
             });
         });

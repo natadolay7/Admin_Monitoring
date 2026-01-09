@@ -20,6 +20,7 @@
                 {{ session('success') }}
             </div>
         @endif
+        @canAdd
         <div class="card mb-3">
             <div class="row p-4">
                 <div class="col-md-6">
@@ -28,11 +29,13 @@
                 </div>
             </div>
         </div>
+        @endcanAdd
         <!-- DataTable with Buttons -->
         <div class="card">
-            <div class="card-datatable table-responsive pt-0">
-                <table class="datatables-basic table">
-                    <thead>
+            <div class="card-body table-responsive pt-0">
+
+                <table class="datatables-basic table table-bordered table-striped"">
+                    <thead class="table-light">
                         <tr>
                             <th>No</th>
                             <th>Day</th>
@@ -75,11 +78,11 @@
                             return meta.row + meta.settings._iDisplayStart + 1;
                         }
                     },
-                     {
+                    {
                         data: 'hari',
                         name: 'hari'
                     },
-                     {
+                    {
                         data: 'tanggal',
                         name: 'tanggal'
                     },
@@ -87,7 +90,7 @@
                         data: 'nama_tad',
                         name: 'nama_tad'
                     },
-                     {
+                    {
                         data: 'nama_shift',
                         name: 'nama_shift'
                     },

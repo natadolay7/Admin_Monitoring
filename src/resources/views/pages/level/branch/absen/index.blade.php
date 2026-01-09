@@ -58,7 +58,7 @@
         <!-- DataTable with Buttons -->
         <div class="card">
             <div class="card-datatable table-responsive pt-0">
-                <table class="datatables-basic table">
+                <table class="datatables-basic table table-bordered table-striped">
                     <thead>
                         <tr>
                             <th>No</th>

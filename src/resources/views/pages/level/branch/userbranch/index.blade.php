@@ -20,27 +20,25 @@
                 {{ session('success') }}
             </div>
         @endif
-        @canAdd
         <div class="card mb-3">
             <div class="row p-4">
                 <div class="col-md-6">
-                    <a href="{{ url('schedule-shift/add') }}" class="btn btn-primary btn-lg">Tambah Data</a>
+                    <a href="{{ url('core/users/add') }}" class="btn btn-primary btn-lg">Tambah Data</a>
 
                 </div>
             </div>
         </div>
-        @endcanAdd
         <!-- DataTable with Buttons -->
         <div class="card">
-            <div class="card-body table-responsive pt-0">
-                <table class="datatables-basic table able-bordered table-striped">
-                    <thead class="table-light">
+            <div class="card-datatable table-responsive pt-0">
+                <table class="datatables-basic table">
+                    <thead>
                         <tr>
                             <th>No</th>
-                            <th>Code</th>
-                            <th>Nama Shift </th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
+                            <th>Username</th>
+                            <th>Nama TAD </th>
+                            <th>Role</th>
+                            <th>Location</th>
                             <th>Created Date</th>
 
                             <th>Action</th>
@@ -62,7 +60,7 @@
             $('.datatables-basic').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ url('schedule-shift/datatable') }}",
+                ajax: "{{ route('user_branch.datatable') }}",
 
                 columns: [{
                         data: null,
@@ -73,23 +71,23 @@
                         }
                     },
                     {
-                        data: 'code',
-                        name: 'code'
+                        data: 'username',
+                        name: 'username'
                     },
-                     {
+                    {
                         data: 'name',
                         name: 'name'
                     },
                     {
-                        data: 'start_time',
-                        name: 'start_time'
-                    },
-                    {
-                        data: 'end_time',
-                        name: 'end_time',
+                        data: 'role',
+                        name: 'role',
                         orderable: false
                     },
-
+                    {
+                        data: 'location',
+                        name: 'location',
+                        orderable: false
+                    },
                     {
                         data: 'created_at',
                         name: 'created_at',

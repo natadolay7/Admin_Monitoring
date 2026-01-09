@@ -39,8 +39,15 @@
         <!-- Dashboards -->
         @if (session('user_role') === 'superadmin_branch')
             @php
-                $masterDataActive = request()->is('management-users*', 'schedule-shift*', 'schedule-list*', 'tasks*' , 'master-patroli*');
-                $masterReportActive = request()->is('report-absensi*' , 'report-patroli*');
+                $masterDataActive = request()->is(
+                    'management-users*',
+                    'schedule-shift*',
+                    'schedule-list*',
+                    'tasks*',
+                    'master-patroli*',
+                );
+                $masterReportActive = request()->is('report-absensi*', 'report-patroli*');
+                $coreActive = request()->is('core/role*', 'core/menu-has-role*', 'core/users*');
 
             @endphp
             <li class="menu-item {{ $masterDataActive ? 'active open' : '' }}">
@@ -70,7 +77,7 @@
                             <div data-i18n="Tasks">Tasks</div>
                         </a>
                     </li>
-                     <li class="menu-item {{ request()->is('master-patroli*') ? 'active' : '' }}">
+                    <li class="menu-item {{ request()->is('master-patroli*') ? 'active' : '' }}">
                         <a href="{{ url('master-patroli') }}" class="menu-link">
                             <div data-i18n="Master Patroli">Master Patroli</div>
                         </a>
@@ -104,7 +111,42 @@
 
                 </ul>
             </li>
+            <li class="menu-item {{ $coreActive ? 'active open' : '' }}">
+                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon icon-base ti tabler-settings"></i>
+                    <div data-i18n="Core ">Core</div>
+                    {{-- <div class="badge text-bg-danger rounded-pill ms-auto">5</div> --}}
+                </a>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ request()->is('core/role*') ? 'active' : '' }}">
+                        <a href="{{ url('core/role') }}" class="menu-link">
+                            <div data-i18n="Role">Role</div>
+                        </a>
+                    </li>
+
+
+                </ul>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ request()->is('core/menu-has-role*') ? 'active' : '' }}">
+                        <a href="{{ url('core/menu-has-role') }}" class="menu-link">
+                            <div data-i18n="Menu Has Role">Menu Has Role</div>
+                        </a>
+                    </li>
+                </ul>
+                <ul class="menu-sub">
+                    <li class="menu-item {{ request()->is('core/users*') ? 'active' : '' }}">
+                        <a href="{{ url('core/users') }}" class="menu-link">
+                            <div data-i18n="Users">Users</div>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        @else
+            @include('layouts.component.sidebar_custom')
+
         @endif
+
+
 
         <!-- Layouts -->
 
