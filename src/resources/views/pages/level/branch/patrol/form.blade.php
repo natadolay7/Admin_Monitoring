@@ -1,21 +1,7 @@
 @extends('layouts.master')
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
 
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
         <form action="{{ url('/master-patroli/store') }}" method="post">
             @csrf
             <div class="row">
@@ -62,5 +48,8 @@
         </form>
 
     </div>
-    </div>
+
+@endsection
+@section('script')
+    @include('layouts.component.toast')
 @endsection

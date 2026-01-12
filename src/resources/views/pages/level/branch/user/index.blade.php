@@ -45,7 +45,9 @@
                             <th>Location</th>
                             <th>Created Date</th>
 
-                            <th>Action</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+
                         </tr>
                     </thead>
                 </table>
@@ -59,6 +61,8 @@
 @endsection
 @section('script')
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         $(function() {
             $('.datatables-basic').DataTable({
@@ -98,11 +102,62 @@
                         orderable: false
                     },
                     {
-                        data: 'action',
+                        data: 'edit',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'delete',
                         orderable: false,
                         searchable: false
                     }
                 ]
+            });
+        });
+    </script>
+    <script>
+        $(document).on('click', '.btn-delete', function() {
+            let id = $(this).data('id');
+
+            Swal.fire({
+                title: 'Yakin hapus?',
+                text: "Data ini tidak bisa dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ url('management-users/delete') }}/" + id,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(res) {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: res.message,
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+
+                            $('.datatables-basic').DataTable().ajax.reload();
+                        },
+                        error: function(err) {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'error',
+                                title: 'Gagal menghapus data',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+                        }
+                    });
+                }
             });
         });
     </script>

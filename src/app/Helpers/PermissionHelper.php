@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 if (!function_exists('getMenuPermission')) {
@@ -31,5 +32,34 @@ if (!function_exists('getMenuPermission')) {
             ->orderBy('m.id')
             ->orderBy('rm.id')
             ->first();   // 👈 hanya 1 data
+    }
+}
+
+if (!function_exists('checkPermission')) {
+    function checkPermission($type)
+    {
+        if (session('user_role') === 'superadmin_branch') {
+            return true;
+        }
+
+        if (!Auth::check()) {
+            return false;
+        }
+
+        $branch = DB::table('user_branch')
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (!$branch) {
+            return false;
+        }
+
+        $permission = getMenuPermission(
+            Auth::id(),
+            $branch->branch_id,
+            request()->segment(1)
+        );
+
+        return ($permission->{$type} ?? 0) == 1;
     }
 }

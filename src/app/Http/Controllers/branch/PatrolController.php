@@ -26,7 +26,11 @@ class PatrolController extends Controller
 
     public function add()
     {
-        return view('pages.level.branch.patrol.form');
+        if (checkPermission('add')) {
+            return view('pages.level.branch.patrol.form');
+        } else {
+            echo "tidak punya akses";
+        }
     }
 
     public function store(Request $request)

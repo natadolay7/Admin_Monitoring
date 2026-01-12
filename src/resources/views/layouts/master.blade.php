@@ -6,8 +6,12 @@
     @include('layouts.component.style')
     @yield('style')
     <style>
-        #template-customizer{
+        #template-customizer {
             display: none;
+        }
+
+        .swal2-container {
+            z-index: 999999 !important;
         }
     </style>
 </head>

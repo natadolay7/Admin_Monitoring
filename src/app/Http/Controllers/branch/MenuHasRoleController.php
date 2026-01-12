@@ -91,6 +91,8 @@ class MenuHasRoleController extends Controller
             ->where('id', $userBranch->branch_id)
             ->first();
 
+
+
         $companyId = $branch->company_id;
         $branchId  = $branch->id;
 
@@ -116,6 +118,7 @@ class MenuHasRoleController extends Controller
             ->where('ub.branch_id', $branchId)
             ->orderBy('m.id')
             ->orderBy('rm.id');
+
 
         return DataTables::of($query)
 

@@ -26,6 +26,7 @@ class ScheduleShiftController extends Controller
         $query = DB::table('schedule_shift as a')
             ->where('a.company_id', $branch)
             ->select([
+                'a.id',
                 'a.code as code',
                 'a.name',
                 'a.start_time',
@@ -36,27 +37,29 @@ class ScheduleShiftController extends Controller
 
 
         return DataTables::of($query)
-            // ->filterColumn('code_company', function ($query, $keyword) {
-            //     $query->whereRaw('LOWER(c.code) LIKE ?', ['%' . strtolower($keyword) . '%']);
-            // })
-            // ->editColumn('email', function ($row) {
-            //     return $row->email ?? '-';
-            // })
-            // ->editColumn('status', function ($row) {
-            //     return $row->status == 1
-            //         ? '<span class="badge bg-success">Active</span>'
-            //         : '<span class="badge bg-secondary">Data Lama</span>';
-            // })
-            ->addColumn('action', function ($row) {
-                return '<button class="btn btn-sm btn-primary">Edit</button>';
+
+            ->addColumn('edit', function ($row) {
+                return checkPermission('edit')
+                    ? '<a href="' . url('schedule-shift/edit/' . $row->id) . '" class="btn btn-sm btn-primary">Edit</a>'
+                    : '';
             })
-            ->rawColumns(['action'])
+
+            ->addColumn('delete', function ($row) {
+                return checkPermission('delete')
+                    ? '<button class="btn btn-sm btn-danger btn-delete" data-id="' . $row->id . '">Delete</button>'
+                    : '';
+            })
+            ->rawColumns(['edit', 'delete'])
             ->make(true);
     }
 
     public function add()
     {
-        return view('pages.level.branch.shift.form');
+        if (checkPermission('add')) {
+            return view('pages.level.branch.shift.form');
+        } else {
+            echo "tidak punya akses";
+        }
     }
 
     public function store(Request $request)
@@ -210,7 +213,7 @@ class ScheduleShiftController extends Controller
 
             DB::commit();
 
-           return redirect()->back()->with('success', 'Berhasil Tergenerate');
+            return redirect()->back()->with('success', 'Berhasil Tergenerate');
         } catch (\Throwable $e) {
             DB::rollBack();
 
@@ -220,4 +223,80 @@ class ScheduleShiftController extends Controller
             ], 500);
         }
     }
+
+
+    public function edit($id)
+    {
+        if (checkPermission('edit')) {
+            $data = DB::table('schedule_shift as a')
+                ->where('a.id', $id)
+                ->select([
+                    'a.id',
+                    'a.code as code',
+                    'a.name',
+                    'a.start_time',
+                    'a.end_time',
+                    'a.created_at'
+                ])
+                ->first();
+            // dd($query);
+            return view('pages.level.branch.shift.form_edit', compact('data'));
+        } else {
+            echo "tidak punya akses";
+        }
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'code' => 'required',
+            'name' => 'required',
+        ]);
+
+        $startTime = $request->start_hour . ':' . $request->start_minute . ':00';
+        $endTime   = $request->end_hour . ':' . $request->end_minute . ':00';
+
+        DB::table('schedule_shift')->where('id', $id)->update([
+            'code' => $request->code,
+            'name' => $request->name,
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Shift berhasil diupdate');
+    }
+
+    public function delete($id)
+{
+    DB::beginTransaction();
+
+    try {
+        $shift = DB::table('schedule_shift')->where('id', $id)->first();
+
+        if (!$shift) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Shift tidak ditemukan'
+            ], 404);
+        }
+
+        DB::table('schedule_shift')->where('id', $id)->delete();
+
+        DB::commit();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Shift berhasil dihapus'
+        ]);
+
+    } catch (\Throwable $e) {
+        DB::rollBack();
+
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
 }

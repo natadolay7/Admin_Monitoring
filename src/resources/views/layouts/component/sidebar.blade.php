@@ -141,9 +141,14 @@
                     </li>
                 </ul>
             </li>
+            <li class="menu-item {{ request()->is('leave*') ? 'active' : '' }}">
+                <a href="{{ url('/leave') }}" class="menu-link">
+                    <i class="menu-icon icon-base ti tabler-calendar-time"></i>
+                    <div data-i18n="Leave">Leave</div>
+                </a>
+            </li>
         @else
             @include('layouts.component.sidebar_custom')
-
         @endif
 
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\branch\AbsenController;
+use App\Http\Controllers\branch\LeaveController;
 use App\Http\Controllers\branch\MenuHasRoleController;
 use App\Http\Controllers\branch\PatrolController;
 use App\Http\Controllers\branch\RoleController;
@@ -51,8 +52,11 @@ Route::middleware('auth')->group(function () {
             ->group(function () {
                 Route::get('/', 'index')->name('index');
                 Route::get('/add', 'add')->name('add');
+                Route::get('/edit/{id}', 'edit');
                 Route::post('/store', 'store')->name('store');
+                Route::post('/update', 'update');
                 Route::get('/datatable', 'datatable')->name('user.datatable');
+                Route::delete('delete/{id}',  'delete');
             });
         Route::prefix('schedule-shift')
             ->controller(ScheduleShiftController::class)->group(function () {
@@ -61,6 +65,9 @@ Route::middleware('auth')->group(function () {
                 Route::post('/store', 'store');
                 Route::get('/datatable', 'datatable')->name('scheduleshift.datatable');
                 Route::get('/generate', 'generateScheduleBalanced');
+                Route::get('/edit/{id}', 'edit');
+                Route::post('/update/{id}', 'update');
+                Route::delete('/delete/{id}', 'delete');
             });
         Route::prefix('schedule-list')
             ->controller(ScheduleController::class)->group(function () {
@@ -105,8 +112,8 @@ Route::middleware('auth')->group(function () {
                         ->group(function () {
                             Route::get('/', 'index');
                             Route::get('/add', 'add');
-                            Route::get( '/role', 'role')->name('role.ajax');
-                            Route::get( '/menu', 'menu')->name('menu.ajax');
+                            Route::get('/role', 'role')->name('role.ajax');
+                            Route::get('/menu', 'menu')->name('menu.ajax');
 
 
                             Route::post('/store', 'store');
@@ -124,19 +131,11 @@ Route::middleware('auth')->group(function () {
                 }
             );
 
-        Route::prefix('v2')
-            ->group(
-                function () {
-                    Route::prefix('management-users')
-                        ->controller(UserController::class)
-                        ->group(function () {
-                            Route::get('/', 'index')->name('index');
-                            Route::get('/add', 'add')->name('add');
-                            Route::post('/store', 'store')->name('store');
-                            Route::get('/datatable', 'datatable')->name('user.datatable');
-                        });
-                }
-            );
+        Route::prefix('leave')
+            ->controller(LeaveController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::get('/datatable', 'datatable')->name('leave.datatable');
+            });
     });
 
 

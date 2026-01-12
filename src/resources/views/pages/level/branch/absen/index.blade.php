@@ -46,15 +46,6 @@
             </div>
         </div>
 
-
-        {{-- <div class="card mb-3">
-            <div class="row p-4">
-                <div class="col-md-6">
-                    <a href="{{ url('schedule-shift/generate') }}" class="btn btn-primary btn-lg">Generate Schedule</a>
-
-                </div>
-            </div>
-        </div> --}}
         <!-- DataTable with Buttons -->
         <div class="card">
             <div class="card-datatable table-responsive pt-0">
