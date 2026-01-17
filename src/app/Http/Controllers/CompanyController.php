@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\DataTables;
+use Illuminate\Validation\Rule;
 
 class CompanyController extends Controller
 {
@@ -20,6 +21,7 @@ class CompanyController extends Controller
             ->leftJoin('user_company as uc', 'c.id', '=', 'uc.company_id')
             ->leftJoin('users as u', 'u.id', '=', 'uc.user_id')
             ->select([
+                'c.id',
                 'c.code as code_company',
                 'u.email',
                 'c.status'
@@ -39,7 +41,10 @@ class CompanyController extends Controller
                     : '<span class="badge bg-secondary">Data Lama</span>';
             })
             ->addColumn('action', function ($row) {
-                return '<button class="btn btn-sm btn-primary">Edit</button>';
+                return '<a href="' . url('v1/company/edit/' . $row->id) . '" class="btn btn-sm btn-primary">Edit</a> <button class="btn btn-sm btn-danger btn-delete"
+                            data-id="' . $row->id . '">
+                            Delete
+                         </button>';
             })
             ->rawColumns(['status', 'action'])
             ->make(true);
@@ -111,6 +116,158 @@ class CompanyController extends Controller
                 ->back()
                 ->withErrors(['error' => $e->getMessage()])
                 ->withInput();
+        }
+    }
+
+    public function edit($id)
+    {
+        $data = DB::table('company as c')->where('c.id', $id)
+            ->leftJoin('user_company as uc', 'c.id', '=', 'uc.company_id')
+            ->leftJoin('users as u', 'u.id', '=', 'uc.user_id')
+            ->select('c.*', 'u.email as username', 'u.name')
+            ->first();
+        return view('pages.company.form', compact('data'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        // 1️⃣ Ambil user_id dari user_company
+        $userCompany = DB::table('user_company')
+            ->where('company_id', $id)
+            ->first();
+
+        $userId = $userCompany?->user_id;
+
+        // 2️⃣ VALIDASI (khusus UPDATE)
+        $request->validate([
+            'username' => [
+                'required',
+                Rule::unique('users', 'email')->ignore($userId),
+            ],
+
+            'password' => [
+                'nullable',
+                'string',
+                'min:6',
+            ],
+
+            'company_name' => ['required', 'string', 'max:255'],
+
+            'company_code' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('company', 'code')->ignore($id),
+            ],
+
+            'company_email' => [
+                'required',
+                'email',
+                Rule::unique('company', 'email')->ignore($id),
+            ],
+
+            'company_contact' => ['required', 'string', 'max:50'],
+            'company_address' => ['required', 'string'],
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+
+            // 3️⃣ UPDATE / INSERT USER
+            $user = $userId ? DB::table('users')->where('id', $userId)->first() : null;
+
+            if ($user) {
+                DB::table('users')->where('id', $userId)->update([
+                    'email'      => $request->username,
+                    'password'   => $request->password
+                        ? Hash::make($request->password)
+                        : $user->password,
+                    'updated_at' => now(),
+                ]);
+            } else {
+                $userId = DB::table('users')->insertGetId([
+                    'name'       => $request->company_name,
+                    'email'      => $request->username,
+                    'password'   => Hash::make($request->password),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            // 4️⃣ UPDATE COMPANY
+            DB::table('company')->where('id', $id)->update([
+                'name'       => $request->company_name,
+                'code'       => $request->company_code,
+                'email'      => $request->company_email,
+                'contact'    => $request->company_contact,
+                'address'    => $request->company_address,
+                'updated_at' => now(),
+                'status'     => 1,
+            ]);
+
+            // 5️⃣ UPDATE / INSERT USER_COMPANY
+            DB::table('user_company')->updateOrInsert(
+                ['company_id' => $id],
+                [
+                    'user_id' => $userId,
+                    'role'    => 1,
+                ]
+            );
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Data Company & User berhasil diperbarui');
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            return redirect()->back()
+                ->withErrors(['error' => $e->getMessage()])
+                ->withInput();
+        }
+    }
+
+    public function delete($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            // Ambil relasi user_company
+            $userCompany = DB::table('user_company')
+                ->where('company_id', $id)
+                ->first();
+
+            // Hapus user jika ada relasi
+            if ($userCompany) {
+                DB::table('users')
+                    ->where('id', $userCompany->user_id)
+                    ->delete();
+
+                DB::table('user_company')
+                    ->where('company_id', $id)
+                    ->delete();
+            }
+
+            // Hapus semua branch
+            DB::table('branch')
+                ->where('company_id', $id)
+                ->delete();
+
+            // Hapus company
+            DB::table('company')
+                ->where('id', $id)
+                ->delete();
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Data berhasil dihapus');
+        } catch (\Throwable $e) {
+
+            DB::rollBack();
+
+            return redirect()->back()
+                ->withErrors(['error' => $e->getMessage()]);
         }
     }
 }

@@ -35,16 +35,7 @@ class PatrolController extends Controller
 
     public function store(Request $request)
     {
-        $userBranch = DB::table('user_branch')
-            ->where('user_id', Auth::user()->id)
-            ->first();
-
-        $branch = DB::table('branch')
-            ->where('id', $userBranch->branch_id)
-            ->first();
-
-        $companyId = $branch->company_id;
-        $branchId  = $branch->id;
+        $branchId = getUserBranchId();
 
 
         $request->validate([
@@ -94,16 +85,7 @@ class PatrolController extends Controller
 
     public function datatable()
     {
-        $userBranch = DB::table('user_branch')
-            ->where('user_id', Auth::user()->id)
-            ->first();
-
-        $branch = DB::table('branch')
-            ->where('id', $userBranch->branch_id)
-            ->first();
-
-        $companyId = $branch->company_id;
-        $branchId  = $branch->id;
+        $branchId = getUserBranchId();
 
         $query = MasterPatroli::where('branch_id', $branchId)
             ->select([
@@ -148,15 +130,7 @@ class PatrolController extends Controller
 
     public function reportDatatable(Request $request)
     {
-        $userBranch = DB::table('user_branch')
-            ->where('user_id', Auth::id())
-            ->first();
-
-        if (!$userBranch) {
-            return response()->json(['data' => []]);
-        }
-
-        $branchId = $userBranch->branch_id;
+        $branchId = getUserBranchId();
 
         $query = DB::table('patroli_report as pr')
             ->select(

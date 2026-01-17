@@ -17,16 +17,7 @@ class LeaveController extends Controller
 
     public function datatable(Request $request)
     {
-        $userBranch = DB::table('user_branch')
-            ->where('user_id', Auth::user()->id)
-            ->first();
-
-        $branch = DB::table('branch')
-            ->where('id', $userBranch->branch_id)
-            ->first();
-
-        $branchId  = $branch->id;
-
+        $branchId = getUserBranchId();
 
         $query = DB::table('leave_new')
             ->where('branch_id',  $branchId)

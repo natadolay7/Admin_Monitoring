@@ -22,10 +22,8 @@ class MenuHasRoleController extends Controller
 
     public function role()
     {
-        $branch = DB::table('user_branch')->where('user_id', Auth::user()->id)->first();
-        $branch = $branch->branch_id;
-
-        $roles = DB::table('role')->where('branch_id', $branch)->get();
+        $branchId = getUserBranchId();
+        $roles = DB::table('role')->where('branch_id', $branchId)->get();
         return response()->json($roles);
     }
 
@@ -37,68 +35,58 @@ class MenuHasRoleController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
-        // ✅ VALIDATION
 
+        $request->validate([
+            'role_id' => 'required|exists:role,id',
+            'menu_id' => 'required|exists:menu,id',
+        ]);
+
+        //  dd($request->all());
 
         DB::beginTransaction();
 
         try {
-            // 1️⃣ INSERT USER
-            $rolemenu = DB::table('role_menu')->insertGetId([
-                'role_id'       => $request->role_id,
-                'menu_id'      => $request->menu_id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            $rolemenu = DB::table('role_menu')->where([
+                'role_id' => $request->role_id,
+                'menu_id' => $request->menu_id,
+            ])->value('id');
 
-            // 2️⃣ INSERT COMPANY
+            if (!$rolemenu) {
+                $rolemenu = DB::table('role_menu')->insertGetId([
+                    'role_id' => $request->role_id,
+                    'menu_id' => $request->menu_id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
 
-
-            // 3️⃣ INSERT USER_COMPANY
-            DB::table('permission_menu')->insert([
-                'role_menu_id' => $rolemenu,
-                'view'   => $request->has('view') ? 1 : 0,
-                'add'    => $request->has('add') ? 1 : 0,
-                'edit'   => $request->has('edit') ? 1 : 0,
-                'delete' => $request->has('delete') ? 1 : 0,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            DB::table('permission_menu')->updateOrInsert(
+                ['role_menu_id' => $rolemenu],
+                [
+                    'view' => $request->has('view') ? 1 : 0,
+                    'add' => $request->has('add') ? 1 : 0,
+                    'edit' => $request->has('edit') ? 1 : 0,
+                    'delete' => $request->has('delete') ? 1 : 0,
+                    'updated_at' => now(),
+                ]
+            );
 
             DB::commit();
 
-            return redirect()
-                ->back()
-                ->with('success', 'Branch & User berhasil ditambahkan');
+            return back()->with('success', 'Permission berhasil disimpan');
         } catch (\Throwable $e) {
             DB::rollBack();
-
-            return redirect()
-                ->back()
-                ->withErrors(['error' => $e->getMessage()])
-                ->withInput();
+            return back()->withErrors(['error' => $e->getMessage()]);
         }
     }
 
     public function datatable()
     {
-        $userBranch = DB::table('user_branch')
-            ->where('user_id', Auth::user()->id)
-            ->first();
-
-        $branch = DB::table('branch')
-            ->where('id', $userBranch->branch_id)
-            ->first();
-
-
-
-        $companyId = $branch->company_id;
-        $branchId  = $branch->id;
+        $branchId = getUserBranchId();
 
         $query = DB::table('role_menu as rm')
             ->selectRaw('
-            u.name as name_user,
+
             rm.id as role_menu_id,
             r.title as role,
             m.id as menu_id,
@@ -112,10 +100,8 @@ class MenuHasRoleController extends Controller
             ->leftJoin('permission_menu as pm', 'pm.role_menu_id', '=', 'rm.id')
             ->leftJoin('role as r', 'r.id', '=', 'rm.role_id')
             ->leftJoin('menu as m', 'm.id', '=', 'rm.menu_id')
-            ->leftJoin('role_user as ru', 'ru.role_id', '=', 'r.id')
-            ->leftJoin('users as u', 'ru.user_id', '=', 'u.id')
-            ->leftJoin('user_branch as ub', 'u.id', '=', 'ub.user_id')
-            ->where('ub.branch_id', $branchId)
+
+            ->where('r.branch_id', $branchId)
             ->orderBy('m.id')
             ->orderBy('rm.id');
 

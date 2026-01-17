@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\DataTables;
 
+use function Symfony\Component\Clock\now;
+
 class UserBranchController extends Controller
 {
     public function index()
@@ -18,18 +20,13 @@ class UserBranchController extends Controller
 
     public function add()
     {
-        $userBranch = DB::table('user_branch')
-            ->where('user_id', Auth::user()->id)
-            ->first();
-
-        $branch = DB::table('branch')
-            ->where('id', $userBranch->branch_id)
-            ->first();
-
-
-        $branchId  = $branch->id;
-        $data = DB::table('role')->where('branch_id', $branchId)->get();
-        return view('pages.level.branch.userbranch.form', compact('data'));
+        if (checkPermission('add')) {
+            $branchId = getUserBranchId();
+            $data2 = DB::table('role')->where('branch_id', $branchId)->get();
+            return view('pages.level.branch.userbranch.form', compact('data2'));
+        } else {
+            echo "tidak punya akses";
+        }
     }
 
     public function store(Request $request)
@@ -97,8 +94,7 @@ class UserBranchController extends Controller
 
     public function datatable()
     {
-        $branch = DB::table('user_branch')->where('user_id', Auth::user()->id)->first();
-        $branch = $branch->branch_id;
+        $branchId = getUserBranchId();
 
         $query = DB::table('users as u')
             ->leftJoin('user_branch as ub', 'u.id', '=', 'ub.user_id')
@@ -106,8 +102,9 @@ class UserBranchController extends Controller
             ->leftJoin('role as r', 'r.id', '=', 'ru.role_id')
             ->leftJoin('branch as b', 'b.id', '=', second: 'ub.branch_id')
             // ->leftJoin('company as c', 'c.id', '=', 'b.company_id')
-            ->where('ub.branch_id', $branch)
+            ->where('ub.branch_id', $branchId)
             ->select([
+                'u.id',
                 'u.email as username',
                 'u.name',
                 'b.name as branch_name',
@@ -119,21 +116,93 @@ class UserBranchController extends Controller
 
 
         return DataTables::of($query)
-            // ->filterColumn('code_company', function ($query, $keyword) {
-            //     $query->whereRaw('LOWER(c.code) LIKE ?', ['%' . strtolower($keyword) . '%']);
-            // })
-            // ->editColumn('email', function ($row) {
-            //     return $row->email ?? '-';
-            // })
-            // ->editColumn('status', function ($row) {
-            //     return $row->status == 1
-            //         ? '<span class="badge bg-success">Active</span>'
-            //         : '<span class="badge bg-secondary">Data Lama</span>';
-            // })
+
             ->addColumn('action', function ($row) {
-                return '<button class="btn btn-sm btn-primary">Edit</button>';
+                $btn = '';
+
+                if (checkPermission('edit')) {
+                    $btn .= '<a href="' . url('/core/users/edit/' . $row->id) . '"
+                            class="btn btn-sm btn-primary me-1">
+                            Edit
+                         </a>';
+                }
+
+                if (checkPermission('delete')) {
+                    $btn .= '<button class="btn btn-sm btn-danger btn-delete"
+                            data-id="' . $row->id . '">
+                            Delete
+                         </button>';
+                };
+
+                return $btn;
             })
             ->rawColumns(['action'])
             ->make(true);
+    }
+
+    public function edit($id)
+    {
+        if (!checkPermission('edit')) {
+            abort(403, 'Tidak punya akses');
+        }
+
+        $branchId = getUserBranchId();
+
+        $data = DB::table('users as u')
+            ->select('u.*', 'ru.role_id')
+            ->leftJoin('user_branch as ub', 'u.id', '=', 'ub.user_id')
+            ->leftJoin('role_user as ru', 'ru.user_id', '=', 'u.id')
+            ->where('u.id', $id)
+            ->first();
+        $data2 = DB::table('role')->where('branch_id', $branchId)->get();
+        if (!$data) {
+            abort(404);
+        }
+
+        return view('pages.level.branch.userbranch.form', compact('data', 'data2'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        if (!checkPermission('edit')) {
+            abort(403, 'Tidak punya akses');
+        }
+
+        $request->validate([
+            'username' => 'required',
+            'name'     => 'required',
+            'role_id'  => 'required',
+        ]);
+
+        $user = DB::table('users')->where('id', $id)->first();
+
+        if (!$user) {
+            abort(404);
+        }
+
+        // Update users table
+        $updateData = [
+            'email' => $request->username,
+            'name'  => $request->name,
+        ];
+
+        // Jika password diisi, baru diupdate
+        if ($request->filled('password')) {
+            $updateData['password'] = bcrypt($request->password);
+        }
+
+        DB::table('users')->where('id', $id)->update($updateData);
+
+        // Update role_user
+        DB::table('role_user')->where('user_id', $id)->delete();
+
+        DB::table('role_user')->insert([
+            'user_id' => $id,
+            'role_id' => $request->role_id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'User berhasil diperbarui');
     }
 }

@@ -6,21 +6,7 @@
 @endsection
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
+        @canAdd
         <div class="card mb-3">
             <div class="row p-4">
                 <div class="col-md-6">
@@ -29,6 +15,7 @@
                 </div>
             </div>
         </div>
+        @endcanAdd
         <div class="card">
             <div class="card-header">
                 <h5 class="mb-0">Role Menu Permission</h5>
@@ -81,8 +68,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: '{{ route('role-menu.datatable') }}',
-                columns: [
-                    {
+                columns: [{
                         data: 'role',
                         name: 'role'
                     },

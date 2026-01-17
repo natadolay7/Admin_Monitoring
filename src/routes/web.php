@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\auth\AuthController;
 use App\Http\Controllers\branch\AbsenController;
+use App\Http\Controllers\branch\AnnouncementController;
 use App\Http\Controllers\branch\LeaveController;
 use App\Http\Controllers\branch\MenuHasRoleController;
 use App\Http\Controllers\branch\PatrolController;
@@ -16,6 +17,9 @@ use App\Http\Controllers\CompanyController;
 use App\Models\MasterPatroli;
 use Illuminate\Support\Facades\Route;
 
+// SUPERADMIN APP
+require __DIR__.'/adminapp.php';
+
 
 Route::group(['middleware' => 'guest'], function () {
     Route::get('/login', [AuthController::class, 'index'])->name('login');
@@ -27,16 +31,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/', function () {
         return view('pages.dashboard.index');
     });
-    // SUPERADMIN APP
-    Route::middleware('superadmin.app')->group(function () {
-        Route::controller(CompanyController::class)->group(function () {
-            Route::get('company', 'index');
-            Route::get('company/datatable', 'datatable')->name('company.datatable');
-            Route::get('company/add', 'add');
-            Route::post('company/store', 'store');
-            Route::get('company/edit/{id}', 'edit');
-        });
-    });
+
+
     // SUPERADMIN COMPANY
     Route::middleware('superadmin.company')->group(function () {
         Route::controller(BranchController::class)->group(function () {
@@ -104,9 +100,11 @@ Route::middleware('auth')->group(function () {
                         ->group(function () {
                             Route::get('/', 'index');
                             Route::get('/add', 'add');
+                            Route::get('/edit/{id}', 'edit');
+                            Route::post('/update/{id}', 'update');
                             Route::post('/store', 'store');
                             Route::get('/datatable', 'datatable')->name('role.datatable');
-                            // Route::get('menu-has-role', 'menuHasRole');
+                            Route::delete('/delete/{id}', 'delete');
                         });
                     Route::prefix('menu-has-role')->controller(MenuHasRoleController::class)
                         ->group(function () {
@@ -114,19 +112,17 @@ Route::middleware('auth')->group(function () {
                             Route::get('/add', 'add');
                             Route::get('/role', 'role')->name('role.ajax');
                             Route::get('/menu', 'menu')->name('menu.ajax');
-
-
                             Route::post('/store', 'store');
                             Route::get('/datatable', 'datatable')->name('role-menu.datatable');
-                            // Route::get('menu-has-role', 'menuHasRole');
                         });
                     Route::prefix('users')->controller(UserBranchController::class)
                         ->group(function () {
                             Route::get('/', 'index');
+                            Route::get('/edit/{id}', 'edit');
                             Route::get('/add', 'add');
                             Route::post('/store', 'store');
+                            Route::post('/update/{id}', 'update');
                             Route::get('/datatable', 'datatable')->name('user_branch.datatable');
-                            // Route::get('menu-has-role', 'menuHasRole');
                         });
                 }
             );
@@ -135,6 +131,17 @@ Route::middleware('auth')->group(function () {
             ->controller(LeaveController::class)->group(function () {
                 Route::get('/', 'index');
                 Route::get('/datatable', 'datatable')->name('leave.datatable');
+            });
+        Route::prefix('master-pengumuman')
+            ->controller(AnnouncementController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::get('/add', 'add');
+                Route::get('/edit/{id}', 'edit');
+                Route::post('/store', 'store');
+                Route::post('/update/{id}', 'update');
+
+                Route::delete('/delete/{id}', 'delete');
+                Route::get('/datatable', 'datatable')->name('pengumuman.datatable');
             });
     });
 

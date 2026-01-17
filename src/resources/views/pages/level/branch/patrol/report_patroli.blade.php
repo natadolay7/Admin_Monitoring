@@ -36,8 +36,8 @@
 
         <!-- TABLE -->
         <div class="card">
-            <div class="card-datatable table-responsive">
-                <table class="table datatables-report">
+            <div class="card-body table-responsive">
+                <table class="table datatables-report table-bordered table-striped">
                     <thead>
                         <tr>
                             <th>No</th>

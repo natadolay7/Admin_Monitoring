@@ -18,23 +18,7 @@ class AbsenController extends Controller
 
     public function datatable(Request $request)
     {
-        $userBranch = DB::table('user_branch')
-            ->where('user_id', Auth::id())
-            ->first();
-
-        if (!$userBranch) {
-            return response()->json(['data' => []]);
-        }
-
-        $branch = DB::table('branch')
-            ->where('id', $userBranch->branch_id)
-            ->first();
-
-        if (!$branch) {
-            return response()->json(['data' => []]);
-        }
-
-        $branchId = $branch->id;
+       $branchId = getUserBranchId();
 
         $query = DB::table('user_attendence as ua')
             ->select(

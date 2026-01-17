@@ -1,43 +1,35 @@
 @extends('layouts.master')
+
 @section('style')
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
 @endsection
+
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
 
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-        @canAdd
         <div class="card mb-3">
             <div class="row p-4">
                 <div class="col-md-6">
-                    <a href="{{ url('core/role/add') }}" class="btn btn-primary btn-lg">Tambah Role</a>
-
+                    @canAdd
+                    <a href="{{ url('master-pengumuman/add') }}" class="btn btn-primary btn-lg">
+                        Tambah Data
+                    </a>
+                    @endcanAdd
                 </div>
             </div>
         </div>
-        @endcanAdd
-        <!-- DataTable with Buttons -->
+
         <div class="card">
-            <div class="card-body table-responsive pt-0">
-                <table class="datatables-basic table table-bordered table-striped">
+            <div class="card-body table-responsive">
+                <table id="pengumumanTable" class="table table-bordered table-striped">
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Title</th>
+                            <th>Judul</th>
+                            <th>Mulai</th>
+                            <th>Selesai</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -45,46 +37,59 @@
             </div>
         </div>
 
-        <hr class="my-12" />
-
-
     </div>
 @endsection
+
 @section('script')
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
+
     <script>
         $(function() {
-            $('.datatables-basic').DataTable({
+            $('#pengumumanTable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('role.datatable') }}",
+                ajax: "{{ route('pengumuman.datatable') }}",
+                order: [
+                    [1, 'desc']
+                ], // default sort ke kolom ke-2 (Judul)
 
                 columns: [{
                         data: null,
                         orderable: false,
                         searchable: false,
-                        render: function(data, type, row, meta) {
-                            return meta.row + meta.settings._iDisplayStart + 1;
-                        }
+                        render: (d, t, r, m) => m.row + 1
                     },
                     {
                         data: 'title',
                         name: 'title'
                     },
-
-
+                    {
+                        data: 'start_date',
+                        name: 'start_date'
+                    },
+                    {
+                        data: 'end_date',
+                        name: 'end_date'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
+                    },
                     {
                         data: 'action',
-                        name: 'action',
-                        orderable: false
-                    },
-
+                        orderable: false,
+                        searchable: false
+                    }
                 ]
             });
+
+
+
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @include('layouts.component.toast')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         $(document).on('click', '.btn-delete', function() {
             let id = $(this).data('id');
@@ -99,14 +104,14 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/core/role/delete/${id}`,
+                        url: `/master-pengumuman/delete/${id}`,
                         type: 'DELETE',
                         data: {
                             _token: "{{ csrf_token() }}"
                         },
                         success: function(res) {
                             Swal.fire('Berhasil!', res.message, 'success');
-                            $('.datatables-basic').DataTable().ajax.reload();
+                            $('#pengumumanTable').DataTable().ajax.reload();
                         },
                         error: function() {
                             Swal.fire('Gagal!', 'Tidak bisa menghapus data', 'error');

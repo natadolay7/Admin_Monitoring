@@ -20,25 +20,27 @@
                 {{ session('success') }}
             </div>
         @endif
-        @canAdd
         <div class="card mb-3">
             <div class="row p-4">
                 <div class="col-md-6">
-                    <a href="{{ url('core/role/add') }}" class="btn btn-primary btn-lg">Tambah Role</a>
+                    <a href="{{ url('v1/branch/add') }}" class="btn btn-primary btn-lg">Tambah Data</a>
 
                 </div>
             </div>
         </div>
-        @endcanAdd
         <!-- DataTable with Buttons -->
         <div class="card">
-            <div class="card-body table-responsive pt-0">
-                <table class="datatables-basic table table-bordered table-striped">
+            <div class="card-datatable table-responsive pt-0">
+                <table class="datatables-basic table">
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Title</th>
-                            <th>Aksi</th>
+                            <th>Company</th>
+                            <th>Company Code</th>
+                            <th>Branch Name</th>
+                            <th>Email/Username </th>
+                            <th>Status</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                 </table>
@@ -57,7 +59,7 @@
             $('.datatables-basic').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('role.datatable') }}",
+                ajax: "{{ route('v1.branch.datatable') }}",
 
                 columns: [{
                         data: null,
@@ -68,23 +70,37 @@
                         }
                     },
                     {
-                        data: 'title',
-                        name: 'title'
+                        data: 'company',
+                        name: 'company'
                     },
-
-
+                     {
+                        data: 'branch_name',
+                        name: 'branch_name'
+                    },
                     {
-                        data: 'action',
-                        name: 'action',
+                        data: 'code',
+                        name: 'code'
+                    },
+                    {
+                        data: 'email',
+                        name: 'email'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status',
                         orderable: false
                     },
-
+                    {
+                        data: 'action',
+                        orderable: false,
+                        searchable: false
+                    }
                 ]
             });
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @include('layouts.component.toast')
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         $(document).on('click', '.btn-delete', function() {
             let id = $(this).data('id');
@@ -99,14 +115,14 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/core/role/delete/${id}`,
-                        type: 'DELETE',
+                        url: `/v1/branch/delete/${id}`,
+                        type: 'GET',
                         data: {
                             _token: "{{ csrf_token() }}"
                         },
                         success: function(res) {
                             Swal.fire('Berhasil!', res.message, 'success');
-                            $('.datatables-basic').DataTable().ajax.reload();
+                            $('.datatables-basic ').DataTable().ajax.reload();
                         },
                         error: function() {
                             Swal.fire('Gagal!', 'Tidak bisa menghapus data', 'error');

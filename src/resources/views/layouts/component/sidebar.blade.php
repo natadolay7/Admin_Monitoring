@@ -21,12 +21,7 @@
             </a>
         </li>
         @if (session('user_role') === 'superadmin_app')
-            <li class="menu-item {{ request()->is('company*') ? 'active' : '' }}">
-                <a href="{{ url('company') }}" class="menu-link">
-                    <i class="menu-icon icon-base ti tabler-layout-board"></i>
-                    <div data-i18n="Company">Company{{ session('user_role') }}</div>
-                </a>
-            </li>
+            @include('layouts.component.custom_sidebar.app')
         @endif
         @if (session('user_role') === 'superadmin_company')
             <li class="menu-item {{ request()->is('branch*') ? 'active' : '' }}">
@@ -45,6 +40,7 @@
                     'schedule-list*',
                     'tasks*',
                     'master-patroli*',
+                    'master-pengumuman*',
                 );
                 $masterReportActive = request()->is('report-absensi*', 'report-patroli*');
                 $coreActive = request()->is('core/role*', 'core/menu-has-role*', 'core/users*');
@@ -80,6 +76,11 @@
                     <li class="menu-item {{ request()->is('master-patroli*') ? 'active' : '' }}">
                         <a href="{{ url('master-patroli') }}" class="menu-link">
                             <div data-i18n="Master Patroli">Master Patroli</div>
+                        </a>
+                    </li>
+                    <li class="menu-item {{ request()->is('master-pengumuman*') ? 'active' : '' }}">
+                        <a href="{{ url('master-pengumuman') }}" class="menu-link">
+                            <div data-i18n="Master Pengumuman">Master Pengumuman</div>
                         </a>
                     </li>
 

@@ -48,7 +48,7 @@
 
         <!-- DataTable with Buttons -->
         <div class="card">
-            <div class="card-datatable table-responsive pt-0">
+            <div class="card-body table-responsive ">
                 <table class="datatables-basic table table-bordered table-striped">
                     <thead>
                         <tr>

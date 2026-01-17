@@ -23,7 +23,7 @@
         <div class="card mb-3">
             <div class="row p-4">
                 <div class="col-md-6">
-                    <a href="{{ url('company/add') }}" class="btn btn-primary btn-lg">Tambah Data</a>
+                    <a href="{{ url('v1/company/add') }}" class="btn btn-primary btn-lg">Tambah Data</a>
 
                 </div>
             </div>
@@ -86,6 +86,39 @@
                         searchable: false
                     }
                 ]
+            });
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).on('click', '.btn-delete', function() {
+            let id = $(this).data('id');
+
+            Swal.fire({
+                title: 'Yakin hapus?',
+                text: "Data tidak bisa dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/v1/company/delete/${id}`,
+                        type: 'GET',
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: function(res) {
+                            Swal.fire('Berhasil!', res.message, 'success');
+                            $('.datatables-basic ').DataTable().ajax.reload();
+                        },
+                        error: function() {
+                            Swal.fire('Gagal!', 'Tidak bisa menghapus data', 'error');
+                        }
+                    });
+                }
             });
         });
     </script>

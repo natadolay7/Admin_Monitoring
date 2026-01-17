@@ -30,7 +30,7 @@
         </div>
         <!-- DataTable with Buttons -->
         <div class="card">
-            <div class="card-body table-responsive pt-0">
+            <div class="card-body table-responsive">
                 <table class="datatables-basic table table-bordered table-striped">
                     <thead class="table-light">
                         <tr>

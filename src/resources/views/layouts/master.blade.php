@@ -18,7 +18,7 @@
 
 <body>
     <!-- Layout wrapper -->
-    <div class="layout-wrapper layout-content-navbar  ">
+    <div class="layout-wrapper layout-content-navbar ">
         <div class="layout-container">
             <!-- Menu -->
             @include('layouts.component.sidebar')

@@ -4,6 +4,7 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}" />
 @endsection
 @section('content')
+
     <div class="container-xxl flex-grow-1 container-p-y">
         @if ($errors->any())
             <div class="alert alert-danger">
@@ -20,25 +21,33 @@
                 {{ session('success') }}
             </div>
         @endif
-        @canAdd
         <div class="card mb-3">
             <div class="row p-4">
                 <div class="col-md-6">
-                    <a href="{{ url('core/role/add') }}" class="btn btn-primary btn-lg">Tambah Role</a>
-
+                    {{-- @canAdd --}}
+                    <a href="{{ url('v1/management-users/add') }}" class="btn btn-primary btn-lg">
+                        Tambah Data .
+                    </a>
+                    {{-- @endcanAdd --}}
                 </div>
             </div>
         </div>
-        @endcanAdd
         <!-- DataTable with Buttons -->
         <div class="card">
             <div class="card-body table-responsive pt-0">
                 <table class="datatables-basic table table-bordered table-striped">
-                    <thead>
+                    <thead class="table-light">
                         <tr>
                             <th>No</th>
-                            <th>Title</th>
-                            <th>Aksi</th>
+                            <th>Username</th>
+                            <th>Nama TAD </th>
+                            <th>Branch Name</th>
+                            <th>Location</th>
+                            <th>Created Date</th>
+
+                            <th>Edit</th>
+                            <th>Delete</th>
+
                         </tr>
                     </thead>
                 </table>
@@ -52,12 +61,14 @@
 @endsection
 @section('script')
     <script src="{{ asset('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         $(function() {
             $('.datatables-basic').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('role.datatable') }}",
+                ajax: "{{ route('v1.user.datatable') }}",
 
                 columns: [{
                         data: null,
@@ -68,30 +79,49 @@
                         }
                     },
                     {
-                        data: 'title',
-                        name: 'title'
+                        data: 'username',
+                        name: 'username'
                     },
-
-
                     {
-                        data: 'action',
-                        name: 'action',
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'branch_name',
+                        name: 'branch_name',
                         orderable: false
                     },
-
+                    {
+                        data: 'location',
+                        name: 'location',
+                        orderable: false
+                    },
+                    {
+                        data: 'created_at',
+                        name: 'created_at',
+                        orderable: false
+                    },
+                    {
+                        data: 'edit',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'delete',
+                        orderable: false,
+                        searchable: false
+                    }
                 ]
             });
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @include('layouts.component.toast')
     <script>
         $(document).on('click', '.btn-delete', function() {
             let id = $(this).data('id');
 
             Swal.fire({
                 title: 'Yakin hapus?',
-                text: "Data tidak bisa dikembalikan!",
+                text: "Data ini tidak bisa dikembalikan!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Ya, hapus',
@@ -99,17 +129,32 @@
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({
-                        url: `/core/role/delete/${id}`,
-                        type: 'DELETE',
+                        url: "{{ url('v1/management-users/delete') }}/" + id,
+                        type: "DELETE",
                         data: {
                             _token: "{{ csrf_token() }}"
                         },
                         success: function(res) {
-                            Swal.fire('Berhasil!', res.message, 'success');
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: res.message,
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
+
                             $('.datatables-basic').DataTable().ajax.reload();
                         },
-                        error: function() {
-                            Swal.fire('Gagal!', 'Tidak bisa menghapus data', 'error');
+                        error: function(err) {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'error',
+                                title: 'Gagal menghapus data',
+                                showConfirmButton: false,
+                                timer: 3000
+                            });
                         }
                     });
                 }
