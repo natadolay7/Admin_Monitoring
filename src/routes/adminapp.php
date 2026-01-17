@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\adminapp\AbsenController;
 use App\Http\Controllers\adminapp\BranchController;
 use App\Http\Controllers\adminapp\UserTadController;
 use App\Http\Controllers\CompanyController;
@@ -38,6 +39,11 @@ Route::middleware('auth')->group(function () {
                 Route::get('/delete/{id}', 'delete');
                 Route::post('/store', 'store');
                 Route::post('/update/{id}', 'update');
+            });
+        Route::prefix('report-absensi')
+            ->controller(AbsenController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::get('/datatable', 'datatable')->name('v1.reportabsensi.datatable');
             });
     });
 });

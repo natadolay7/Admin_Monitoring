@@ -19,7 +19,7 @@
         // 'master-patroli*',
         // 'master-pengumuman*',
     );
-    $masterReportActive = request()->is('report-absensi*', 'report-patroli*');
+    $masterReportActive = request()->is('v1/report-absensi*', 'report-patroli*');
     $coreActive = request()->is('core/role*', 'core/menu-has-role*', 'core/users*');
 
 @endphp
@@ -71,8 +71,8 @@
         {{-- <div class="badge text-bg-danger rounded-pill ms-auto">5</div> --}}
     </a>
     <ul class="menu-sub">
-        <li class="menu-item {{ request()->is('report-absensi*') ? 'active' : '' }}">
-            <a href="{{ url('report-absensi') }}" class="menu-link">
+        <li class="menu-item {{ request()->is('v1/report-absensi*') ? 'active' : '' }}">
+            <a href="{{ url('v1/report-absensi') }}" class="menu-link">
                 <div data-i18n="Report Absensi">Report Absensi</div>
             </a>
         </li>

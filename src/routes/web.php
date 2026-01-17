@@ -14,6 +14,7 @@ use App\Http\Controllers\branch\UserBranchController;
 use App\Http\Controllers\branch\UserController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\DashboardController;
 use App\Models\MasterPatroli;
 use Illuminate\Support\Facades\Route;
 
@@ -28,9 +29,7 @@ Route::group(['middleware' => 'guest'], function () {
 
 
 Route::middleware('auth')->group(function () {
-    Route::get('/', function () {
-        return view('pages.dashboard.index');
-    });
+    Route::get('/', [DashboardController::class , 'index']);
 
 
     // SUPERADMIN COMPANY
