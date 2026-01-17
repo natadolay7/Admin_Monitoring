@@ -289,7 +289,7 @@ class BranchController extends Controller
                     ->delete();
 
                 DB::table('user_branch')
-                    ->where('company_id', $id)
+                    ->where('user_id', $userCompany->user_id)
                     ->delete();
             }
 
