@@ -72,6 +72,8 @@ Route::middleware('auth')->group(function () {
         Route::prefix('tasks')
             ->controller(TaskController::class)->group(function () {
                 Route::get('/', 'index');
+                Route::get('/add', 'add');
+
                 Route::get('/datatable', 'datatable')->name('task.datatable');
             });
         Route::prefix('master-patroli')

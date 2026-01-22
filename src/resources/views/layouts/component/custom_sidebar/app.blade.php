@@ -13,8 +13,8 @@
 @php
     $masterDataActive = request()->is(
         'v1/management-users*',
-        // 'schedule-shift*',
-        // 'schedule-list*',
+        'v1/schedule-shift*',
+        'v1/schedule-list*',
         // 'tasks*',
         // 'master-patroli*',
         // 'master-pengumuman*',
@@ -35,13 +35,13 @@
                 <div data-i18n="User TAD">User TAD</div>
             </a>
         </li>
-        <li class="menu-item {{ request()->is('schedule-shift*') ? 'active' : '' }}">
-            <a href="{{ url('schedule-shift') }}" class="menu-link">
+        <li class="menu-item {{ request()->is('v1/schedule-shift*') ? 'active' : '' }}">
+            <a href="{{ url('v1/schedule-shift') }}" class="menu-link">
                 <div data-i18n="Shift">Shift</div>
             </a>
         </li>
-        <li class="menu-item {{ request()->is('schedule-list*') ? 'active' : '' }}">
-            <a href="{{ url('schedule-list') }}" class="menu-link">
+        <li class="menu-item {{ request()->is('v1/schedule-list*') ? 'active' : '' }}">
+            <a href="{{ url('v1/schedule-list') }}" class="menu-link">
                 <div data-i18n="Schedule">Schedule</div>
             </a>
         </li>

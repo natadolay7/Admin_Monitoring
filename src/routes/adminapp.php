@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\adminapp\AbsenController;
 use App\Http\Controllers\adminapp\BranchController;
+use App\Http\Controllers\adminapp\AppScheduleShiftController;
+use App\Http\Controllers\adminapp\ScheduleController;
 use App\Http\Controllers\adminapp\UserTadController;
 use App\Http\Controllers\CompanyController;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +46,22 @@ Route::middleware('auth')->group(function () {
             ->controller(AbsenController::class)->group(function () {
                 Route::get('/', 'index');
                 Route::get('/datatable', 'datatable')->name('v1.reportabsensi.datatable');
+            });
+        Route::prefix('schedule-shift')
+            ->controller(AppScheduleShiftController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::get('/add', 'add');
+                Route::post('/store', 'store');
+                Route::get('/datatable', 'datatable')->name('v1.scheduleshift.datatable');
+                Route::get('/generate', 'generateScheduleBalanced');
+                Route::get('/edit/{id}', 'edit');
+                Route::post('/update/{id}', 'update');
+                Route::delete('/delete/{id}', 'delete');
+            });
+        Route::prefix('schedule-list')
+            ->controller(ScheduleController::class)->group(function () {
+                Route::get('/', 'index');
+                Route::get('/datatable', 'datatable')->name('v1.schedulelist.datatable');
             });
     });
 });

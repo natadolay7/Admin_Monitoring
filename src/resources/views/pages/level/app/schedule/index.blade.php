@@ -20,25 +20,35 @@
                 {{ session('success') }}
             </div>
         @endif
-        <div class="card mb-3">
+        {{-- @canAdd  --}}
+        {{-- <div class="card mb-3">
             <div class="row p-4">
                 <div class="col-md-6">
-                    <a href="{{ url('tasks/add') }}" class="btn btn-primary btn-lg">Add Task</a>
+                    <a href="{{ url('v1/schedule-shift/generate') }}" class="btn btn-primary btn-lg">Generate Schedule</a>
+
                 </div>
             </div>
-        </div>
+        </div> --}}
+        {{-- @endcanAdd --}}
         <!-- DataTable with Buttons -->
         <div class="card">
             <div class="card-body table-responsive pt-0">
-                <table class="datatables-basic table table-bordered table-striped">
+
+                <table class="datatables-basic table table-bordered table-striped"">
                     <thead class="table-light">
                         <tr>
                             <th>No</th>
-                            <th>Name</th>
+                            <th>Day</th>
+                            <th>Tanggal</th>
 
-                            <th>Note</th>
-                            <th>Type</th>
-                            <th>Action</th>
+                            <th>Nama TAD </th>
+                            <th>Nama Shift </th>
+
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Status</th>
+                            <th>Created Date</th>
+
 
                         </tr>
                     </thead>
@@ -58,7 +68,7 @@
             $('.datatables-basic').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('task.datatable') }}",
+                ajax: "{{ route('v1.schedulelist.datatable') }}",
 
                 columns: [{
                         data: null,
@@ -69,20 +79,39 @@
                         }
                     },
                     {
-                        data: 'name',
-                        name: 'name'
+                        data: 'hari',
+                        name: 'hari'
                     },
                     {
-                        data: 'note',
-                        name: 'note'
+                        data: 'tanggal',
+                        name: 'tanggal'
                     },
                     {
-                        data: 'type',
-                        name: 'type'
+                        data: 'nama_tad',
+                        name: 'nama_tad'
                     },
                     {
-                        data: 'action',
-                        name: 'action',
+                        data: 'nama_shift',
+                        name: 'nama_shift'
+                    },
+                    {
+                        data: 'start_time',
+                        name: 'start_time'
+                    },
+                    {
+                        data: 'end_time',
+                        name: 'end_time',
+                        orderable: false
+                    },
+                    {
+                        data: 'holiday',
+                        name: 'hodiday',
+                        orderable: false
+                    },
+
+                    {
+                        data: 'created_at',
+                        name: 'created_at',
                         orderable: false
                     },
 

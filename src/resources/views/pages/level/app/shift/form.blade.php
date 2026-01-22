@@ -2,7 +2,7 @@
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
 
-        <form action="{{ url('/schedule-shift/store') }}" method="post">
+        <form action="{{ url('v1/schedule-shift/store') }}" method="post">
             @csrf
             <div class="row">
 
@@ -15,13 +15,20 @@
                     <div class="card-body p-4">
 
                         <div class="row mb-3">
+                             <div class="col-md-6 mb-6">
+                                <label class="form-label">Company </label>
+                                <select id="company" class="form-control" name="company_id">
+                                    <option value="">-- Pilih Company --</option>
+                                </select>
+
+                            </div>
                             <div class="col-md-6 mb-6">
                                 <label class="form-label">Code Shift</label>
+
                                 <input type="text" name="code" class="form-control" placeholder="Masukkan username">
                             </div>
                             <div class="col-md-6 mb-6">
                                 <label class="form-label">Nama Shift</label>
-
                                 <input type="text" name="name" class="form-control" placeholder="Masukkan password">
                             </div>
                             <div class="col-md-6 mb-6">
@@ -83,4 +90,32 @@
 @endsection
 @section('script')
     @include('layouts.component.toast')
+     <script>
+        $(document).ready(function() {
+
+            let oldCompany = $('#old_company').val();
+            let oldBranch = $('#old_branch').val();
+
+            // Load Company
+            $.ajax({
+                url: "/v1/get-company",
+                type: "GET",
+                success: function(data) {
+                    $('#company').empty().append('<option value="">-- Pilih Company --</option>');
+
+                    $.each(data, function(key, value) {
+                        let selected = (value.id == oldCompany) ? 'selected' : '';
+                        $('#company').append(
+                            `<option value="${value.id}" ${selected}>${value.name}</option>`
+                        );
+                    });
+                }
+            });
+
+
+
+
+
+        });
+    </script>
 @endsection
